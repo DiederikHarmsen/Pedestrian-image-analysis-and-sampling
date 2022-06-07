@@ -10,30 +10,12 @@ def brightness( im_file ):
    return math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
 
 
-Pictures = "C:/Users/diede/Documents/EDAN70 ML fairness project/smirk/Datasets"
+Pictures = "Locations of folders with pictures you want to check brightness in"
 dir_listdir = os.listdir(Pictures)
-#for filename in dir_listdir:
-#   print(dir_listdir)
-#   print(filename)
-#   print(str(os.path.splitext(filename)))
-#   im = Image.open(filename)
-#   stat = ImageStat.Stat(im)
-#   r,g,b = stat.mean
-#   print(r, " and " , g , "and", b)
-#   value = brightness(filename)
-#   print(str(value))
 
-Images_checked = 0
-Average_brightness = 0
-Pictures0to20 = 0
-Pictures20to40 = 0
-Pictures40to60 = 0
-Pictures60to80 = 0
-Pictures80to100 = 0
-Pictures100to120 = 0
-Pictures120to140 = 0
-Pictures140plus = 0
+Images_checked, Average_brightness, Pictures0to20, Pictures20to40, Pictures40to60, Pictures60to80, Pictures80to100, Pictures100to120, Pictures120to140 Pictures140plus = 0
 
+# Iterates through directories
 for dirs in os.listdir(Pictures):
    subdir = os.path.join(Pictures, dirs)
    for subdirs in os.listdir(subdir):
@@ -93,11 +75,3 @@ print("140+: ", Pictures0to20)
 
 
 
-#for k in glob.glob(Pictures):
-#   im = Image.open(k)
-#   stat = ImageStat.Stat(im)
-#   r,g,b = stat.mean
-#   print(r, " and " , g , "and", b)
-#   print("Brightness perceived as: " ,math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2)))
-   
- 
