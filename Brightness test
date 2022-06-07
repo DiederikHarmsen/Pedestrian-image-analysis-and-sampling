@@ -1,0 +1,76 @@
+import math, random, os, glob
+from PIL import Image, ImageStat
+
+
+def brightness( im_file ):
+   im = Image.open(im_file)
+   stat = ImageStat.Stat(im)
+   r,g,b = stat.mean
+   print(r, " and " , g , "and", b)
+   return math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
+
+
+
+#for filename in dir_listdir:
+#   print(dir_listdir)
+#   print(filename)
+#   print(str(os.path.splitext(filename)))
+#   im = Image.open(filename)
+#   stat = ImageStat.Stat(im)
+#   r,g,b = stat.mean
+#   print(r, " and " , g , "and", b)
+#   value = brightness(filename)
+#   print(str(value))
+
+
+Images_checked = 0
+Average_brightness = 0
+Pictures0to20, Pictures20to40, Pictures40to60, Pictures60to80, Pictures80to100, Pictures100to120, Pictures120to140, Pictures140to160, Pictures160plus = 0
+
+#for pngfile in glob.glob("C:/Users/diede/Documents/EDAN70 ML fairness project/INRIA/INRIA/INRIAPerson/INRIAPerson/70X134H96/Test/pos/*.png"):
+#Pictures = "C:/Users/diede/Documents/EDAN70 ML fairness project/INRIA/INRIA/INRIAPerson/INRIAPerson/70X134H96/Test/pos"
+Pictures = "C:/Users/diede/Documents/EDAN70 ML fairness project/PennFudanPed/PennFudanPed/PNGImages"
+dir_listdir = os.listdir(Pictures)
+
+for filename in os.listdir(Pictures):
+   for pngfile in glob.iglob(os.path.join(Pictures, filename)):
+      im = Image.open(pngfile)
+      stat = ImageStat.Stat(im)
+      r,g,b,z = stat.mean
+      brightval = math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
+      Images_checked += 1
+      Average_brightness += brightval
+      brightval = int(brightval)
+      if 0 <= brightval < 20:
+         Pictures0to20 = Pictures0to20 + 1
+      elif 20 <= brightval < 40:
+         Pictures20to40 = Pictures20to40 + 1
+      elif 40 <= brightval < 60:
+         Pictures40to60 = Pictures40to60 + 1
+      elif 60 <= brightval < 80:
+         Pictures60to80 = Pictures60to80 + 1
+      elif 80 <= brightval < 100:
+         Pictures80to100 = Pictures80to100 + 1
+      elif 100 <= brightval < 120:
+         Pictures100to120 = Pictures100to120 + 1
+      elif 120 <= brightval < 140:
+         Pictures120to140 = Pictures120to140 + 1
+      elif 140 <= brightval < 160:
+         Pictures140to160 = Pictures140to160 + 1
+      elif 140 <= brightval:
+         Pictures160plus = Pictures160plus + 1
+
+Average_brightness = Average_brightness/Images_checked
+
+print("Images checked: ", Images_checked)
+print("Average Brightness: ", Average_brightness)
+print("0-20: ", Pictures0to20)
+print("20-40: ", Pictures20to40)
+print("40-60: ", Pictures40to60)
+print("60-80: ", Pictures60to80)
+print("80-100: ", Pictures80to100)
+print("100-120: ", Pictures100to120)
+print("120-140: ", Pictures120to140)
+print("140-160: ", Pictures140to160)
+print("160+: ", Pictures160plus)
+ 

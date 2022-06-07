@@ -1,0 +1,61 @@
+import shutil,os, glob
+import os.path
+import random
+
+
+rootdir = "C:/Users/diede/Documents/EDAN70 ML fairness project/INRIA/Sorted/"
+
+child = 0
+female = 0 
+male = 0 
+adult = 0
+unspecified_gender = 0
+unspecified_race = 0
+unspecified_age = 0
+total = 0
+
+for dirs in os.listdir(rootdir):
+    print(dirs)
+    subdir = os.path.join(rootdir, dirs)
+    print(subdir)
+    subdirs_listing = os.listdir(subdir)
+    print(len(subdirs_listing))
+    if "female" in dirs: 
+        female = female + len()
+        adult = adult + len(subdirs_listing)
+        unspecified_race = unspecified_race + len(subdirs_listing)
+    elif "male" in dirs:
+        male = male + len(subdirs_listing)
+        adult = adult + len(subdirs_listing)
+        unspecified_race = unspecified_race + len(subdirs_listing)
+    elif "Child" in dirs: 
+        child = child + len(subdirs_listing)
+        unspecified_gender = unspecified_gender + len(subdirs_listing)
+        unspecified_race = unspecified_race + len(subdirs_listing)
+    else:
+        unspecified_gender += len(subdirs_listing)
+        unspecified_race += len(subdirs_listing)
+        unspecified_age += len(subdirs_listing)
+
+
+
+
+print("total amount :" + str(total))
+print("amount of children are:" + str(child))
+print("amount of adults are:" + str(adult))
+print("amount of males are:" + str(male))
+print("amount of females are:" + str(female))
+print("amount of unspecified genders are: " + str(unspecified_gender))
+ratiochildren = int((child / (child + adult + unspecified_age))*100)
+ratioadult = int((adult / (child + adult + unspecified_age))*100)
+ratiomale = int((male / (male + female + unspecified_gender))*100)
+ratiofemale = int((female / (male + female + unspecified_gender))*100)
+ratiounspecgend = int((unspecified_gender / (male + female + unspecified_gender))*100)
+print("ratio children of the chosen datasets " +  str(ratiochildren) + "%")
+print("ratio unspecified gender of the chosen datasets " +  str(ratiounspecgend) + "%")
+print("ratio females of the chosen datasets " +  str(ratiofemale) + "%")
+print("ratio males of the chosen datasets " +  str(ratiomale) + "%")
+print("ratio adults of the chosen datasets " +  str(ratioadult) + "%")
+
+ 
+        
