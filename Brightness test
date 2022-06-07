@@ -1,7 +1,7 @@
 import math, random, os, glob
 from PIL import Image, ImageStat
 
-
+# Defines brightness as a value based on 
 def brightness( im_file ):
    im = Image.open(im_file)
    stat = ImageStat.Stat(im)
@@ -9,29 +9,18 @@ def brightness( im_file ):
    print(r, " and " , g , "and", b)
    return math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
 
-
-
-#for filename in dir_listdir:
-#   print(dir_listdir)
-#   print(filename)
-#   print(str(os.path.splitext(filename)))
-#   im = Image.open(filename)
-#   stat = ImageStat.Stat(im)
-#   r,g,b = stat.mean
-#   print(r, " and " , g , "and", b)
-#   value = brightness(filename)
-#   print(str(value))
-
-
+# Not the most efficiant way but categorizes the images based on brightness given value form the brightness function into 20-value increments. 
 Images_checked = 0
-Average_brightness = 0
+Total_brightness = 0
 Pictures0to20, Pictures20to40, Pictures40to60, Pictures60to80, Pictures80to100, Pictures100to120, Pictures120to140, Pictures140to160, Pictures160plus = 0
 
-#for pngfile in glob.glob("C:/Users/diede/Documents/EDAN70 ML fairness project/INRIA/INRIA/INRIAPerson/INRIAPerson/70X134H96/Test/pos/*.png"):
-#Pictures = "C:/Users/diede/Documents/EDAN70 ML fairness project/INRIA/INRIA/INRIAPerson/INRIAPerson/70X134H96/Test/pos"
-Pictures = "C:/Users/diede/Documents/EDAN70 ML fairness project/PennFudanPed/PennFudanPed/PNGImages"
+
+# Gets the directory of the pictures.
+Pictures = "##Location of pictures##"
 dir_listdir = os.listdir(Pictures)
 
+# Iterates through the pictures and adds amount to correct category.
+# Will fix an attribute to image objects in next release to make it more efficient. 
 for filename in os.listdir(Pictures):
    for pngfile in glob.iglob(os.path.join(Pictures, filename)):
       im = Image.open(pngfile)
@@ -39,7 +28,7 @@ for filename in os.listdir(Pictures):
       r,g,b,z = stat.mean
       brightval = math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
       Images_checked += 1
-      Average_brightness += brightval
+      Total_brightness += brightval
       brightval = int(brightval)
       if 0 <= brightval < 20:
          Pictures0to20 = Pictures0to20 + 1
@@ -60,8 +49,12 @@ for filename in os.listdir(Pictures):
       elif 140 <= brightval:
          Pictures160plus = Pictures160plus + 1
 
-Average_brightness = Average_brightness/Images_checked
 
+# Get average brightness 
+Average_brightness = Total_brightness/Images_checked
+
+
+Just prints out the information I wanted.
 print("Images checked: ", Images_checked)
 print("Average Brightness: ", Average_brightness)
 print("0-20: ", Pictures0to20)
