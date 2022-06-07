@@ -3,22 +3,15 @@ import os.path
 import random
 
 
-rootdir = "C:/Users/diede/Documents/EDAN70 ML fairness project/smirk/Datasets/"
+rootdir = "#root directory with folders that containt the images"
 
-child = 0
-female = 0 
-male = 0 
-adult = 0
-unspecified_gender = 0
-unspecified_race = 0
-unspecified_age = 0
-total = 0
-
+child, female, male, adult, unspecified_gender, unspecified_race, unspecified_age, total = 0
+# Iterates through the root directory and finds all the folders.
 for dirs in os.listdir(rootdir):
     subdir = os.path.join(rootdir,dirs)
     for subdirs in os.listdir(subdir):
         
-
+        # Once again 
         #print(subdirs)
         subdirs = os.path.join(subdir, subdirs)
         subdirs_listing = os.listdir(subdirs)
@@ -44,7 +37,7 @@ for dirs in os.listdir(rootdir):
             unspecified_race += len(subdirs_listing)
             unspecified_age += len(subdirs_listing)
 
-
+# Just a dump of information I wanted, gonna move it to a document next. 
 print("total amount :" + str(total))
 print("amount of children are:" + str(child))
 print("amount of adults are:" + str(adult))
