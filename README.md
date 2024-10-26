@@ -1,7 +1,5 @@
 # Pedestrian-image-analysis-and-sampling
-Was playing around with some images of pedestrians I had, used different datasets found, and wanted to check how variated the images were and wanted to get some samples 
-from a large dataset. 
+This project is meant to showcase my abilities with working with the package os and simple analytics of images. 
+There were two things that were challenges on this project. The images were categorized and divided into folders which were named after which type of pedestrian it was (woman, man, child). Because of this I could iterate through the folders, take a certain  amount of random pictures of each folder and in this way get a random sample of all the images which I then could control to make sure that they were of equal quality or had similar parameters to ensure fairness in the dataset. 
 
-The brightness files check the colors in the images to analyze how bright they are. A really simple way of doing it.
-
-The sampling files gets some samples of the images in folders and copies them to a destination folder.
+The other challenge was how to check how the images differed. Based on my solution of sampling images I could get a represantive sample which I then went through and checked brightness of the image. Ideally I would have liked to separate and investigate both the brightness of how the pedestrian was dressed and how the bright the surrounding were but I have not found a solution for this yet so for now it checks the overall brightness of the image. 
