@@ -1,61 +1,77 @@
-import shutil,os, glob
-import os.path
+import shutil
+import os
+import glob
 import random
 
+def get_subdir_listing(subdir):
+    return list(filter(lambda k: not "labels" in k and not "cam.cap" in k, os.listdir(subdir)))
 
-rootdir = "C:/Users/diede/Documents/EDAN70 ML fairness project/INRIA/Sorted/"
+def update_counts(category, count_dict, count):
+    count_dict[category] += count
 
-child = 0
-female = 0 
-male = 0 
-adult = 0
-unspecified_gender = 0
-unspecified_race = 0
-unspecified_age = 0
-total = 0
+def calculate_ratios(count_dict):
+    ratios = {}
+    total_images = count_dict['child'] + count_dict['adult'] + count_dict['unspecified_age']
+    ratios['ratio_children'] = int((count_dict['child'] / total_images) * 100)
+    ratios['ratio_adult'] = int((count_dict['adult'] / total_images) * 100)
+    
+    total_gender = count_dict['male'] + count_dict['female'] + count_dict['unspecified_gender']
+    ratios['ratio_male'] = int((count_dict['male'] / total_gender) * 100)
+    ratios['ratio_female'] = int((count_dict['female'] / total_gender) * 100)
+    ratios['ratio_unspecified_gender'] = int((count_dict['unspecified_gender'] / total_gender) * 100)
+    
+    return ratios
 
-for dirs in os.listdir(rootdir):
-    print(dirs)
-    subdir = os.path.join(rootdir, dirs)
-    print(subdir)
-    subdirs_listing = os.listdir(subdir)
-    print(len(subdirs_listing))
-    if "female" in dirs: 
-        female = female + len()
-        adult = adult + len(subdirs_listing)
-        unspecified_race = unspecified_race + len(subdirs_listing)
-    elif "male" in dirs:
-        male = male + len(subdirs_listing)
-        adult = adult + len(subdirs_listing)
-        unspecified_race = unspecified_race + len(subdirs_listing)
-    elif "Child" in dirs: 
-        child = child + len(subdirs_listing)
-        unspecified_gender = unspecified_gender + len(subdirs_listing)
-        unspecified_race = unspecified_race + len(subdirs_listing)
-    else:
-        unspecified_gender += len(subdirs_listing)
-        unspecified_race += len(subdirs_listing)
-        unspecified_age += len(subdirs_listing)
-
-
-
-
-print("total amount :" + str(total))
-print("amount of children are:" + str(child))
-print("amount of adults are:" + str(adult))
-print("amount of males are:" + str(male))
-print("amount of females are:" + str(female))
-print("amount of unspecified genders are: " + str(unspecified_gender))
-ratiochildren = int((child / (child + adult + unspecified_age))*100)
-ratioadult = int((adult / (child + adult + unspecified_age))*100)
-ratiomale = int((male / (male + female + unspecified_gender))*100)
-ratiofemale = int((female / (male + female + unspecified_gender))*100)
-ratiounspecgend = int((unspecified_gender / (male + female + unspecified_gender))*100)
-print("ratio children of the chosen datasets " +  str(ratiochildren) + "%")
-print("ratio unspecified gender of the chosen datasets " +  str(ratiounspecgend) + "%")
-print("ratio females of the chosen datasets " +  str(ratiofemale) + "%")
-print("ratio males of the chosen datasets " +  str(ratiomale) + "%")
-print("ratio adults of the chosen datasets " +  str(ratioadult) + "%")
-
- 
+def main():
+    rootdir = "C:/Users/diede/Documents/EDAN70 ML fairness project/INRIA/Sorted/"
+    
+    count_dict = {
+        "child": 0,
+        "female": 0,
+        "male": 0,
+        "adult": 0,
+        "unspecified_gender": 0,
+        "unspecified_race": 0,
+        "unspecified_age": 0,
+        "total": 0
+    }
+    
+    for dirs in os.listdir(rootdir):
+        subdir = os.path.join(rootdir, dirs)
+        subdirs_listing = get_subdir_listing(subdir)
         
+        count_dict["total"] += len(subdirs_listing)
+        
+        if "female" in dirs:
+            update_counts("female", count_dict, len(subdirs_listing))
+            update_counts("adult", count_dict, len(subdirs_listing))
+            update_counts("unspecified_race", count_dict, len(subdirs_listing))
+        elif "male" in dirs:
+            update_counts("male", count_dict, len(subdirs_listing))
+            update_counts("adult", count_dict, len(subdirs_listing))
+            update_counts("unspecified_race", count_dict, len(subdirs_listing))
+        elif "Child" in dirs:
+            update_counts("child", count_dict, len(subdirs_listing))
+            update_counts("unspecified_gender", count_dict, len(subdirs_listing))
+            update_counts("unspecified_race", count_dict, len(subdirs_listing))
+        else:
+            update_counts("unspecified_gender", count_dict, len(subdirs_listing))
+            update_counts("unspecified_race", count_dict, len(subdirs_listing))
+            update_counts("unspecified_age", count_dict, len(subdirs_listing))
+    
+    ratios = calculate_ratios(count_dict)
+    
+    print(f"Total amount: {count_dict['total']}")
+    print(f"Amount of children: {count_dict['child']}")
+    print(f"Amount of adults: {count_dict['adult']}")
+    print(f"Amount of males: {count_dict['male']}")
+    print(f"Amount of females: {count_dict['female']}")
+    print(f"Amount of unspecified genders: {count_dict['unspecified_gender']}")
+    print(f"Ratio children of the chosen datasets: {ratios['ratio_children']}%")
+    print(f"Ratio unspecified gender of the chosen datasets: {ratios['ratio_unspecified_gender']}%")
+    print(f"Ratio females of the chosen datasets: {ratios['ratio_female']}%")
+    print(f"Ratio males of the chosen datasets: {ratios['ratio_male']}%")
+    print(f"Ratio adults of the chosen datasets: {ratios['ratio_adult']}%")
+
+if __name__ == "__main__":
+    main()
