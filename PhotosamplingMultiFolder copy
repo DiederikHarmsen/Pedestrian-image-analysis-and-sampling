@@ -1,36 +1,46 @@
-import shutil,os, glob
-import os.path
+import shutil
+import os
+import glob
 import random
 
+def get_used_dir_listing(useddir):
+    dir_listing = os.listdir(useddir)
+    used_dir_listing = list(filter(lambda k: not "labels" in k and not "cam.cap" in k, dir_listing))
+    return used_dir_listing
 
-rootdir = "C:/Users/diede/Documents/EDAN70 ML fairness project/smirk/Datasets/"
-dst_dir = "C:/Users/diede/Documents/EDAN70 ML fairness project/Python script/Sampling"
+def get_samples(used_dir_listing):
+    Third = int(len(used_dir_listing) / 3)
+    sample1 = str(random.randint(0, Third)).zfill(6)
+    sample2 = str(random.randint(Third, Third * 2)).zfill(6)
+    sample3 = str(random.randint(Third * 2, Third * 3)).zfill(6)
+    return sample1, sample2, sample3
 
+def copy_samples_to_dst(useddir, used_dir_listing, samples, dst_dir):
+    for filename in used_dir_listing:
+        for pngfile in glob.iglob(os.path.join(useddir, filename)):
+            if any(sample in filename for sample in samples):
+                shutil.copy(pngfile, dst_dir)
 
+def main(rootdir, dst_dir):
+    for dirs in os.listdir(rootdir):
+        print(dirs)
+        subdir = os.path.join(rootdir, dirs)
+        for subdirs in os.listdir(subdir):
+            print(subdirs)
+            useddir = os.path.join(subdir, subdirs)
+            used_dir_listing = get_used_dir_listing(useddir)
+            
+            print(used_dir_listing)
+            print(len(used_dir_listing))
+            print(useddir)
+            
+            samples = get_samples(used_dir_listing)
+            print(' '.join(samples))
+            
+            copy_samples_to_dst(useddir, used_dir_listing, samples, dst_dir)
 
-        
-
-for dirs in os.listdir(rootdir):
-    print(dirs)
-    subdir = os.path.join(rootdir,dirs)
-    for subdirs in os.listdir(subdir):
-        print(subdirs)
-        useddir = os.path.join(subdir, subdirs)
-        dir_listing = os.listdir(useddir)
-        used_dir_listing = list(filter(lambda k: not "labels" in k, dir_listing))
-        used_dir_listing = list(filter(lambda k: not "cam.cap" in k, used_dir_listing))
-        print(used_dir_listing)
-        print(len(used_dir_listing))
-        print(useddir)
-        Third = int(len(used_dir_listing)/3)
-        sample1 = str(random.randint(0, Third)).zfill(6)
-        sample2 = str(random.randint(Third, Third*2)).zfill(6)
-        sample3 = str(random.randint(Third*2, Third*3)).zfill(6)
-        print(sample1 + sample2 + sample3)
-        for filename in used_dir_listing:
-            for pngfile in glob.iglob(os.path.join(useddir, filename)):
-                if sample1 in filename or sample2 in filename or sample3 in filename:
-                    shutil.copy(pngfile, dst_dir)
-
-
+if __name__ == "__main__":
+    rootdir = "C:/Users/diede/Documents/EDAN70 ML fairness project/smirk/Datasets/"
+    dst_dir = "C:/Users/diede/Documents/EDAN70 ML fairness project/Python script/Sampling"
+    main(rootdir, dst_dir)
 
