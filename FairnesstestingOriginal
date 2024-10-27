@@ -1,59 +1,83 @@
-import shutil,os, glob
-import os.path
+import shutil
+import os
+import glob
 import random
 
+def list_files(rootdir):
+    files_info = {
+        "child": 0,
+        "female": 0,
+        "male": 0,
+        "adult": 0,
+        "unspecified_gender": 0,
+        "unspecified_race": 0,
+        "unspecified_age": 0,
+        "total": 0
+    }
+    
+    for dirs in os.listdir(rootdir):
+        subdir = os.path.join(rootdir, dirs)
+        for subdirs in os.listdir(subdir):
+            subdirs_path = os.path.join(subdir, subdirs)
+            subdirs_listing = os.listdir(subdirs_path)
+            subdirs_listing = list(filter(lambda k: not "labels" in k, subdirs_listing))
+            subdirs_listing = list(filter(lambda k: not "cam.cap" in k, subdirs_listing))
+            files_info["total"] += len(subdirs_listing)
+            
+            if "female" in dirs:
+                files_info["female"] += len(subdirs_listing)
+                files_info["adult"] += len(subdirs_listing)
+                files_info["unspecified_race"] += len(subdirs_listing)
+            elif "male" in dirs:
+                files_info["male"] += len(subdirs_listing)
+                files_info["adult"] += len(subdirs_listing)
+                files_info["unspecified_race"] += len(subdirs_listing)
+            elif "child" in dirs:
+                files_info["child"] += len(subdirs_listing)
+                files_info["unspecified_gender"] += len(subdirs_listing)
+                files_info["unspecified_race"] += len(subdirs_listing)
+            else:
+                files_info["unspecified_gender"] += len(subdirs_listing)
+                files_info["unspecified_race"] += len(subdirs_listing)
+                files_info["unspecified_age"] += len(subdirs_listing)
+    
+    return files_info
 
-rootdir = "#root directory with folders that containt the images"
+def calculate_ratios(files_info):
+    ratio_children = int((files_info["child"] / (files_info["child"] + files_info["adult"] + files_info["unspecified_age"])) * 100)
+    ratio_adult = int((files_info["adult"] / (files_info["child"] + files_info["adult"] + files_info["unspecified_age"])) * 100)
+    ratio_male = int((files_info["male"] / (files_info["male"] + files_info["female"] + files_info["unspecified_gender"])) * 100)
+    ratio_female = int((files_info["female"] / (files_info["male"] + files_info["female"] + files_info["unspecified_gender"])) * 100)
+    ratio_unspecified_gender = int((files_info["unspecified_gender"] / (files_info["male"] + files_info["female"] + files_info["unspecified_gender"])) * 100)
+    
+    ratios = {
+        "ratio_children": ratio_children,
+        "ratio_adult": ratio_adult,
+        "ratio_male": ratio_male,
+        "ratio_female": ratio_female,
+        "ratio_unspecified_gender": ratio_unspecified_gender
+    }
+    
+    return ratios
 
-child, female, male, adult, unspecified_gender, unspecified_race, unspecified_age, total = 0
-# Iterates through the root directory and finds all the folders.
-for dirs in os.listdir(rootdir):
-    subdir = os.path.join(rootdir,dirs)
-    for subdirs in os.listdir(subdir):
-        
-        # Once again 
-        #print(subdirs)
-        subdirs = os.path.join(subdir, subdirs)
-        subdirs_listing = os.listdir(subdirs)
-        subdirs_listing = list(filter(lambda k: not "labels" in k, subdirs_listing))
-        subdirs_listing = list(filter(lambda k: not "cam.cap" in k, subdirs_listing))
-        #print(subdirs_listing)
-        #print(len(subdirs_listing))
-        total += len(subdirs_listing)
-        if "female" in dirs: 
-            female = female + len(subdirs_listing)
-            adult = adult + len(subdirs_listing)
-            unspecified_race = unspecified_race + len(subdirs_listing)
-        elif "male" in dirs:
-            male = male + len(subdirs_listing)
-            adult = adult + len(subdirs_listing)
-            unspecified_race = unspecified_race + len(subdirs_listing)
-        elif "child" in dirs: 
-            child = child + len(subdirs_listing)
-            unspecified_gender = unspecified_gender + len(subdirs_listing)
-            unspecified_race = unspecified_race + len(subdirs_listing)
-        else:
-            unspecified_gender += len(subdirs_listing)
-            unspecified_race += len(subdirs_listing)
-            unspecified_age += len(subdirs_listing)
+def print_summary(files_info, ratios):
+    print(f"Total amount: {files_info['total']}")
+    print(f"Amount of children: {files_info['child']}")
+    print(f"Amount of adults: {files_info['adult']}")
+    print(f"Amount of males: {files_info['male']}")
+    print(f"Amount of females: {files_info['female']}")
+    print(f"Amount of unspecified genders: {files_info['unspecified_gender']}")
+    print(f"Ratio children of the chosen datasets: {ratios['ratio_children']}%")
+    print(f"Ratio unspecified gender of the chosen datasets: {ratios['ratio_unspecified_gender']}%")
+    print(f"Ratio females of the chosen datasets: {ratios['ratio_female']}%")
+    print(f"Ratio males of the chosen datasets: {ratios['ratio_male']}%")
+    print(f"Ratio adults of the chosen datasets: {ratios['ratio_adult']}%")
 
-# Just a dump of information I wanted, gonna move it to a document next. 
-print("total amount :" + str(total))
-print("amount of children are:" + str(child))
-print("amount of adults are:" + str(adult))
-print("amount of males are:" + str(male))
-print("amount of females are:" + str(female))
-print("amount of unspecified genders are: " + str(unspecified_gender))
-ratiochildren = int((child / (child + adult + unspecified_age))*100)
-ratioadult = int((adult / (child + adult + unspecified_age))*100)
-ratiomale = int((male / (male + female + unspecified_gender))*100)
-ratiofemale = int((female / (male + female + unspecified_gender))*100)
-ratiounspecgend = int((unspecified_gender / (male + female + unspecified_gender))*100)
-print("ratio children of the chosen datasets " +  str(ratiochildren) + "%")
-print("ratio unspecified gender of the chosen datasets " +  str(ratiounspecgend) + "%")
-print("ratio females of the chosen datasets " +  str(ratiofemale) + "%")
-print("ratio males of the chosen datasets " +  str(ratiomale) + "%")
-print("ratio adults of the chosen datasets " +  str(ratioadult) + "%")
+def main():
+    rootdir = "#root directory with folders that contain the images"
+    files_info = list_files(rootdir)
+    ratios = calculate_ratios(files_info)
+    print_summary(files_info, ratios)
 
- 
-        
+if __name__ == "__main__":
+    main()
