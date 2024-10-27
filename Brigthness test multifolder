@@ -1,77 +1,84 @@
-import math, random, os, glob
+import math
+import random
+import os
+import glob
 from PIL import Image, ImageStat
 
+def brightness(im_file):
+    im = Image.open(im_file)
+    stat = ImageStat.Stat(im)
+    r, g, b = stat.mean
+    print(r, " and ", g, "and", b)
+    return math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
 
-def brightness( im_file ):
-   im = Image.open(im_file)
-   stat = ImageStat.Stat(im)
-   r,g,b = stat.mean
-   print(r, " and " , g , "and", b)
-   return math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
+def get_used_dir_listing(subdir):
+    dir_listing = os.listdir(subdir)
+    used_dir_listing = list(filter(lambda k: not "labels" in k, dir_listing))
+    used_dir_listing = list(filter(lambda k: not "cam.cap" in k, used_dir_listing))
+    return used_dir_listing
 
+def select_samples(used_dir_listing):
+    Third = int(len(used_dir_listing) / 3)
+    sample1 = str(random.randint(0, Third)).zfill(6)
+    sample2 = str(random.randint(Third, Third * 2)).zfill(6)
+    sample3 = str(random.randint(Third * 2, Third * 3)).zfill(6)
+    return sample1, sample2, sample3
 
-Pictures = "Locations of folders with pictures you want to check brightness in"
-dir_listdir = os.listdir(Pictures)
+def process_images(Pictures):
+    Images_checked = 0
+    Total_brightness = 0
+    brightness_categories = {
+        "0-20": 0,
+        "20-40": 0,
+        "40-60": 0,
+        "60-80": 0,
+        "80-100": 0,
+        "100-120": 0,
+        "120-140": 0,
+        "140+": 0,
+    }
+    
+    for dirs in os.listdir(Pictures):
+        subdir = os.path.join(Pictures, dirs)
+        for subdirs in os.listdir(subdir):
+            useddir = os.path.join(subdir, subdirs)
+            used_dir_listing = get_used_dir_listing(useddir)
+            sample1, sample2, sample3 = select_samples(used_dir_listing)
+            for filename in used_dir_listing:
+                for pngfile in glob.iglob(os.path.join(useddir, filename)):
+                    if sample1 in filename or sample2 in filename or sample3 in filename:
+                        brightval = brightness(pngfile)
+                        Images_checked += 1
+                        Total_brightness += brightval
+                        brightval = int(brightval)
+                        
+                        if brightval < 20:
+                            brightness_categories["0-20"] += 1
+                        elif brightval < 40:
+                            brightness_categories["20-40"] += 1
+                        elif brightval < 60:
+                            brightness_categories["40-60"] += 1
+                        elif brightval < 80:
+                            brightness_categories["60-80"] += 1
+                        elif brightval < 100:
+                            brightness_categories["80-100"] += 1
+                        elif brightval < 120:
+                            brightness_categories["100-120"] += 1
+                        elif brightval < 140:
+                            brightness_categories["120-140"] += 1
+                        else:
+                            brightness_categories["140+"] += 1
+                            
+    Average_brightness = Total_brightness / Images_checked if Images_checked else 0
+    
+    print("Images checked: ", Images_checked)
+    print("Average Brightness: ", Average_brightness)
+    for category, count in brightness_categories.items():
+        print(f"{category}: {count}")
 
-Images_checked, Average_brightness, Pictures0to20, Pictures20to40, Pictures40to60, Pictures60to80, Pictures80to100, Pictures100to120, Pictures120to140 Pictures140plus = 0
+def main():
+    Pictures = "Locations of folders with pictures you want to check brightness in"
+    process_images(Pictures)
 
-# Iterates through directories
-for dirs in os.listdir(Pictures):
-   subdir = os.path.join(Pictures, dirs)
-   for subdirs in os.listdir(subdir):
-      useddir = os.path.join(subdir, subdirs)
-      dir_listing = os.listdir(useddir)
-      used_dir_listing = list(filter(lambda k: not "labels" in k, dir_listing))
-      used_dir_listing = list(filter(lambda k: not "cam.cap" in k, used_dir_listing))
-      Third = int(len(used_dir_listing)/3)
-      sample1 = str(random.randint(0, Third)).zfill(6)
-      sample2 = str(random.randint(Third, Third*2)).zfill(6)
-      sample3 = str(random.randint(Third*2, Third*3)).zfill(6)
-      for filename in used_dir_listing:
-         for pngfile in glob.iglob(os.path.join(useddir, filename)):
-            if sample1 in filename or sample2 in filename or sample3 in filename:  
-               im = Image.open(pngfile)
-               stat = ImageStat.Stat(im)
-               r,g,b = stat.mean
-               brightval = math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))
-               Images_checked += 1
-               Average_brightness += brightval
-               brightval = int(brightval)
-               if 0 <= brightval < 20:
-                  Pictures0to20 = Pictures0to20 + 1
-               elif 20 <= brightval < 40:
-                  Pictures20to40 = Pictures20to40 + 1
-               elif 40 <= brightval < 60:
-                  Pictures40to60 = Pictures40to60 + 1
-               elif 60 <= brightval < 80:
-                  Pictures60to80 = Pictures60to80 + 1
-               elif 80 <= brightval < 100:
-                  Pictures80to100 = Pictures80to100 + 1
-               elif 100 <= brightval < 120:
-                  Pictures100to120 = Pictures100to120 + 1
-               elif 120 <= brightval < 140:
-                  Pictures120to140 = Pictures120to140 + 1
-               elif 140 <= brightval:
-                  Pictures140plus = Pictures140plus + 1
-
-Average_brightness = Average_brightness/Images_checked
-
-print("Images checked: ", Images_checked)
-print("Average Brightness: ", Average_brightness)
-print("0-20: ", Pictures0to20)
-print("20-40: ", Pictures0to20)
-print("40-60: ", Pictures0to20)
-print("60-80: ", Pictures0to20)
-print("80-100: ", Pictures0to20)
-print("100-120: ", Pictures0to20)
-print("120-140: ", Pictures0to20)
-print("140+: ", Pictures0to20)
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    main()
