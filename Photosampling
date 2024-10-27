@@ -1,48 +1,42 @@
-
-import shutil,os, glob
-import os.path
+import shutil
+import os
+import glob
 import random
 
 
-
-
-
 #find a way to loop through all the folders. 
-src_dir = "C:/Users/diede/Documents/EDAN70 ML fairness project/smirk/Datasets/child/0BV1MUjf3hg2FHDXs6WZ7"
-dir_listing = os.listdir(src_dir)
-used_dir_listing = list(filter(lambda k: not "labels" in k, dir_listing))
-used_dir_listing = list(filter(lambda k: not "cam.cap" in k, used_dir_listing))
-dst_dir = "C:/Users/diede/Documents/EDAN70 ML fairness project/Python script/Sampling"
-#for x in range(10):
-
-#    pic = ("cam00000" + str(x) + ".png")
-#    print(pic)
-#    
-#    shutil.copy(glob.iglob(os.path.join(src_dir, "pic")), dst_dir)
+def list_used_files(src_dir):
+    dir_listing = os.listdir(src_dir)
+    used_dir_listing = list(filter(lambda k: not "labels" in k, dir_listing))
+    used_dir_listing = list(filter(lambda k: not "cam.cap" in k, used_dir_listing))
+    return used_dir_listing
 
 
 #randomizer for three values within three sections of the folder. Also checking if we have the correct files. 
-print(len(used_dir_listing))
-Third = int(len(used_dir_listing)/3)
-sample1 = random.randint(0, Third)
-sample2 = random.randint(Third, Third * 2)
-sample3 = random.randint(Third*2, int(len(used_dir_listing)))
-print(sample1, sample2, sample3)
-print((str(sample1)).zfill(6) + ".png")
-print((str(sample2)).zfill(6) + ".png")
-print((str(sample3)).zfill(6) + ".png")
-print(used_dir_listing)
-usedsample1 = (str(sample1)).zfill(6)
-usedsample2 = (str(sample2)).zfill(6)
-usedsample3 = (str(sample3)).zfill(6)
+def select_samples(used_dir_listing):
+    Third = int(len(used_dir_listing) / 3)
+    sample1 = random.randint(0, Third)
+    sample2 = random.randint(Third, Third * 2)
+    sample3 = random.randint(Third * 2, int(len(used_dir_listing)))
+    samples = [(str(sample)).zfill(6) for sample in [sample1, sample2, sample3]]
+    return samples
 
 
 #Only needs to pick out only the samples. 
 #choose three pictures from the given folder.
-#for pngfile in glob.iglob(os.path.join(src_dir, "*.png")):
-#    shutil.copy(pngfile, dst_dir)
-for filename in used_dir_listing:
-    for pngfile in glob.iglob(os.path.join(src_dir, filename)):
-        if usedsample1 in filename or usedsample2 in filename or usedsample3 in filename:
-            shutil.copy(pngfile, dst_dir)
+def copy_selected_files(src_dir, dst_dir, used_dir_listing, samples):
+    for filename in used_dir_listing:
+        for pngfile in glob.iglob(os.path.join(src_dir, filename)):
+            if any(sample in filename for sample in samples):
+                shutil.copy(pngfile, dst_dir)
+
+def main():
+    src_dir = "C:/Users/diede/Documents/EDAN70 ML fairness project/smirk/Datasets/child/0BV1MUjf3hg2FHDXs6WZ7"
+    dst_dir = "C:/Users/diede/Documents/EDAN70 ML fairness project/Python script/Sampling"
+    used_dir_listing = list_used_files(src_dir)
+    samples = select_samples(used_dir_listing)
+    copy_selected_files(src_dir, dst_dir, used_dir_listing, samples)
+
+if __name__ == "__main__":
+    main()
 
